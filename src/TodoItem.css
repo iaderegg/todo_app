@@ -42,9 +42,9 @@
 }
 
 .Icon-delete {
-    position: absolute;
-    top: -24px;
-    right: 0;
+    position: relative;
+    top: 0px;
+    right: 0px;
 }
 
 .Icon-delete:hover {
