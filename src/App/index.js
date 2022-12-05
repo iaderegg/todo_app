@@ -1,7 +1,6 @@
 import React from 'react';
 import { AppUI } from './AppUI';
 
-
 //import './App.css';
 
 //const defaultTodos = [
@@ -12,33 +11,57 @@ import { AppUI } from './AppUI';
 
 function useLocalStorage(itemName, initialValue) {
 
-  const localStorageItem = localStorage.getItem(itemName);
-  let parsedItem;
+  const [loading, setLoading] = React.useState(true);
+  const {error, setError} = React.useState(false);
+  const [item, setItem] = React.useState(initialValue);
 
-  if (!localStorageItem) {
-    localStorageItem.setItem(itemName, JSON.stringify(initialValue));
-    parsedItem = initialValue;
-  } else {
-    parsedItem = JSON.parse(localStorageItem);
-  }
+  React.useEffect(() => {
+    try {
+      setTimeout(() => {
+        const localStorageItem = localStorage.getItem(itemName);
+        let parsedItem;
 
-  const [item, setItem] = React.useState(parsedItem);
+        if (!localStorageItem) {
+          localStorageItem.setItem(itemName, JSON.stringify(initialValue));
+          parsedItem = initialValue;
+        } else {
+          parsedItem = JSON.parse(localStorageItem);
+        }
+
+        setItem(parsedItem);
+        setLoading(false);
+      }, 1000);
+    } catch(error) {
+      setError(error);
+    }
+  });
 
   const saveItem = (newItem) => {
-    const stringifiedItem = JSON.stringify(newItem);
-    localStorage.setItem(itemName, stringifiedItem);
-    setItem(newItem);
+    try {
+      const stringifiedItem = JSON.stringify(newItem);
+      localStorage.setItem(itemName, stringifiedItem);
+      setItem(newItem);
+    } catch(error) {
+      setError(error);
+    }
   };
 
-  return [
+  return {
     item,
     saveItem,
-  ];
+    loading,
+    error,
+  };
 }
 
 function App() {
 
-  const [todos, saveTodos] = useLocalStorage('TODOS_V1', []);
+  const {
+    item: todos,
+    saveItem: saveTodos,
+    loading,
+    error,
+  } = useLocalStorage('TODOS_V1', []);
   const [searchValue, setSearchValue] = React.useState('');
 
   const completedTodos = todos.filter(todo => !!todo.completed).length;
@@ -76,6 +99,8 @@ function App() {
 
   return (
     <AppUI
+      loading={loading}
+      error={error}
       totalTodos={totalTodos}
       completedTodos={completedTodos}
       searchValue={searchValue}
