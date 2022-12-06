@@ -48,12 +48,22 @@ function TodoProvider(props) {
     saveTodos(newTodos);
   };
 
+  const addTodo = (text) => {
+    const newTodos = [...todos];
+    newTodos.push({
+      completed: false,
+      text: text,
+    });
+    saveTodos(newTodos);
+  };
+
   return (
     <TodoContext.Provider value={{
       loading,
       error,
       totalTodos,
       completedTodos,
+      addTodo,
       searchValue,
       setSearchValue,
       searchedTodos,
